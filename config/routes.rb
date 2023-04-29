@@ -7,4 +7,13 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "articles#index"
+  namespace :api do
+    namespace :v1 do
+      resources :members, only: %i[index create show update destroy]
+      resources :projects, only: %i[index create show update destroy]
+      resources :teams, only: %i[index create show update destroy]
+
+      post 'authenticate', to: 'authentication#create'
+    end
+  end
 end
