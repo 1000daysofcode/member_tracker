@@ -2,16 +2,15 @@
 
 require 'rails_helper'
 
-RSpec.describe Api::V1::MembersController, type: :controller do
-  Member.destroy_all
+RSpec.describe Api::V1::TeamsController, type: :controller do
+  Team.destroy_all
 
-  let!(:team) { FactoryBot.create(:team, name: 'Test Team') }
   let!(:user) { FactoryBot.create(:user, password: 'password1') }
 
-  it 'limits response size to 50 members' do
-    expect(Member).to receive(:limit).with(50).and_call_original
+  it 'limits response size to 50 teams' do
+    expect(Team).to receive(:limit).with(10).and_call_original
 
-    get :index, params: { limit: 100 }
+    get :index, params: { limit: 50 }
   end
 
   describe 'POST create' do
@@ -20,13 +19,12 @@ RSpec.describe Api::V1::MembersController, type: :controller do
         allow(AuthenticationTokenService).to receive(:decode).and_return(user.id)
       end
 
-      it 'creates a new member' do
+      it 'creates a new team' do
         expect do
           post :create,
-               params: { member: { first_name: 'Bill', last_name: 'Bob', city: 'Yale',
-                                   state: 'Connecticut', country: 'USA', team_id: team.id },
+               params: { team: { name: 'Test Team 1' },
                          headers: { 'Authorization' => 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Jddfq3-7sAXByGP8q58Iu43FIMA1DW1Kz_08tGb9VKI' } }
-        end.to change { Member.count }.from(0).to(1)
+        end.to change { Team.count }.from(0).to(1)
 
         expect(Team.count).to eq(1)
       end
@@ -35,8 +33,7 @@ RSpec.describe Api::V1::MembersController, type: :controller do
     context 'missing authorization header' do
       it 'returns status 401' do
         post :create,
-             params: { member: { first_name: 'Bill', last_name: 'Bob', city: 'Yale',
-                                 state: 'Connecticut', country: 'USA', team_id: team.id },
+             params: { team: { name: 'Test Team 1' },
                        headers: {} }
 
         expect(response).to have_http_status(:unauthorized)
@@ -54,32 +51,18 @@ RSpec.describe Api::V1::MembersController, type: :controller do
     end
   end
 
-  describe 'PUT /members/:id' do
+  describe 'PUT update team' do
     let!(:user) { FactoryBot.create(:user, password: 'password1') }
-    let!(:team) { FactoryBot.create(:team, name: 'Test Team') }
-    let!(:alt_team) { FactoryBot.create(:team, name: 'Alternative Team') }
-    let!(:member) do
-      FactoryBot.create(:member, first_name: 'Bill', last_name: 'Bob', city: 'Yale',
-                                 state: 'Connecticut', country: 'USA', team_id: team.id)
-    end
+    let!(:team) { FactoryBot.create(:team, name: 'Test Team 1') }
 
     context 'with authorization header' do
       before do
         allow(AuthenticationTokenService).to receive(:decode).and_return(user.id)
       end
 
-      it 'updates a member' do
+      it 'updates a team' do
         patch :update, params: {
-          id: member.id, country: 'Canada',
-          headers: { 'Authorization' => 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Jddfq3-7sAXByGP8q58Iu43FIMA1DW1Kz_08tGb9VKI' }
-        }
-
-        expect(response).to have_http_status(:accepted)
-      end
-
-      it 'changes a member team' do
-        patch :update, params: {
-          id: member.id, team_name: 'Alternative Team',
+          id: team.id, name: 'Test Team 2',
           headers: { 'Authorization' => 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Jddfq3-7sAXByGP8q58Iu43FIMA1DW1Kz_08tGb9VKI' }
         }
 
@@ -89,27 +72,44 @@ RSpec.describe Api::V1::MembersController, type: :controller do
 
     context 'missing authorization header' do
       it 'returns status 401' do
-        patch :update, params: { id: member.id, country: 'Canada', headers: {} }
+        patch :update, params: { id: team.id, name: 'Test Team 2', headers: {} }
 
         expect(response).to have_http_status(:unauthorized)
       end
     end
   end
 
-  describe 'GET /members/:id' do
-    let!(:team) { FactoryBot.create(:team, name: 'Test Team') }
-    let!(:member) do
+  describe 'GET show team' do
+    let!(:team) { FactoryBot.create(:team, name: 'Test Team 1') }
+    let!(:team2) { FactoryBot.create(:team, name: 'Test Team 2') }
+
+    before do
       FactoryBot.create(:member, first_name: 'Bill', last_name: 'Bob', city: 'Yale',
                                  state: 'Connecticut', country: 'USA', team_id: team.id)
+      FactoryBot.create(:member, first_name: 'Jenny', last_name: 'Gump', city: 'New Orleans',
+                                 state: 'Louisiana', country: 'USA', team_id: team.id)
+      FactoryBot.create(:member, first_name: 'Foo', last_name: 'Bar', city: 'Palo Alto',
+                                 state: 'California', country: 'USA', team_id: team2.id)
     end
 
-    it 'displays a specific member' do
+    it 'displays a specific team' do
       get :show, params: {
-        id: member.id,
+        id: team.id,
         headers: { 'Authorization' => 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Jddfq3-7sAXByGP8q58Iu43FIMA1DW1Kz_08tGb9VKI' }
       }
 
       expect(response).to have_http_status(:ok)
     end
+
+    it 'displays all members of a team' do
+      get :show_members, params: {
+        id: team.id,
+        headers: { 'Authorization' => 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Jddfq3-7sAXByGP8q58Iu43FIMA1DW1Kz_08tGb9VKI' }
+      }
+
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body).length).to eq(2)
+    end
+
   end
 end
