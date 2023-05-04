@@ -3,7 +3,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '3.0.0'
+ruby '3.2.2'
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
 gem 'rails', '~> 7.0.4', '>= 7.0.4.3'
@@ -36,7 +36,7 @@ gem 'jbuilder'
 # gem "kredis"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
-# gem "bcrypt", "~> 3.1.7"
+gem 'bcrypt', '~> 3.1.7'
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: %i[mingw mswin x64_mingw jruby]
@@ -65,6 +65,11 @@ group :development, :test do
   # Linter
   gem 'rubocop', require: true
   gem 'rubocop-rails'
+
+  # Testing
+  gem 'factory_bot_rails'
+  gem 'rspec'
+  gem 'rspec-rails'
 end
 
 group :development do
@@ -87,3 +92,5 @@ end
 
 gem 'cssbundling-rails'
 gem 'font-awesome-sass', '~> 6.4.0'
+gem 'jwt'
+gem 'tailwindcss-rails'

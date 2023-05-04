@@ -3,6 +3,7 @@ require: rubocop-rails
 AllCops:
   Exclude:
     - 'bin/bundle'
+    - 'db/schema.rb'
     - 'config/environments/*'
     - 'gemfiles/vendor/bundle/**/*'
     - 'vendor/**/*'
@@ -12,6 +13,9 @@ AllCops:
     rubocop-capybara: false
 
 Metrics/BlockLength:
+  IgnoredMethods:
+    - 'context'
+    - 'describe'
   Max: 35
 
 Metrics/CyclomaticComplexity:
@@ -22,3 +26,6 @@ Metrics/MethodLength:
 
 Metrics/PerceivedComplexity:
   Max: 10
+
+Style/Documentation:
+  Enabled: false
