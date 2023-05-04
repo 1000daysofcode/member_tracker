@@ -6,7 +6,7 @@ class AuthenticationTokenService
   def self.encode(user_id)
     payload = { user_id: }
 
-    token = JWT.encode payload, HMAC_SECRET, ALGO_TYPE
+    JWT.encode payload, HMAC_SECRET, ALGO_TYPE
   end
 
   def self.decode(token)

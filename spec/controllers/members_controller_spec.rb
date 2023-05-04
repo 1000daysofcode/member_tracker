@@ -25,7 +25,7 @@ RSpec.describe Api::V1::MembersController, type: :controller do
           post :create,
                params: { member: { first_name: 'Bill', last_name: 'Bob', city: 'Yale',
                                    state: 'Connecticut', country: 'USA', team_id: team.id },
-                         headers: { 'Authorization' => 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Jddfq3-7sAXByGP8q58Iu43FIMA1DW1Kz_08tGb9VKI' } }
+                         headers: test_bearer }
         end.to change { Member.count }.from(0).to(1)
 
         expect(Team.count).to eq(1)
@@ -71,7 +71,7 @@ RSpec.describe Api::V1::MembersController, type: :controller do
       it 'updates a member' do
         patch :update, params: {
           id: member.id, country: 'Canada',
-          headers: { 'Authorization' => 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Jddfq3-7sAXByGP8q58Iu43FIMA1DW1Kz_08tGb9VKI' }
+          headers: test_bearer
         }
 
         expect(response).to have_http_status(:accepted)
@@ -80,7 +80,7 @@ RSpec.describe Api::V1::MembersController, type: :controller do
       it 'changes a member team' do
         patch :update, params: {
           id: member.id, team_name: 'Alternative Team',
-          headers: { 'Authorization' => 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Jddfq3-7sAXByGP8q58Iu43FIMA1DW1Kz_08tGb9VKI' }
+          headers: test_bearer
         }
 
         expect(response).to have_http_status(:accepted)
@@ -106,7 +106,7 @@ RSpec.describe Api::V1::MembersController, type: :controller do
     it 'displays a specific member' do
       get :show, params: {
         id: member.id,
-        headers: { 'Authorization' => 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Jddfq3-7sAXByGP8q58Iu43FIMA1DW1Kz_08tGb9VKI' }
+        headers: test_bearer
       }
 
       expect(response).to have_http_status(:ok)

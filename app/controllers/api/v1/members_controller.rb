@@ -33,9 +33,6 @@ module Api
         @member = Member.find(params[:id])
 
         begin
-          team_id = @member.team_id
-          team_id = Team.find_by(name: params[:team_name]).id if params.include?(:team_name)
-
           params[:team_id] = team_id
         rescue ActiveRecord::RecordNotFound, NoMethodError
           render json: @member.errors, status: :unprocessable_entity and return
@@ -64,6 +61,12 @@ module Api
         User.find(user_id)
       rescue ActiveRecord::RecordNotFound, JWT::DecodeError
         head :unauthorized
+      end
+
+      def team_id
+        return @member.team_id unless params.include?(:team_name)
+
+        Team.find_by(name: params[:team_name]).id
       end
 
       def limit

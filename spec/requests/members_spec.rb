@@ -59,7 +59,7 @@ describe 'Members API', type: :request do
         post '/api/v1/members',
              params: { member: { first_name: 'Bill', last_name: 'Bob', city: 'Yale',
                                  state: 'Connecticut', country: 'USA', team_id: team.id } },
-             headers: { 'Authorization' => 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Jddfq3-7sAXByGP8q58Iu43FIMA1DW1Kz_08tGb9VKI' }
+             headers: test_bearer
       end.to change { Member.count }.from(0).to(1)
       expect(Team.count).to eq(1)
 
@@ -83,7 +83,7 @@ describe 'Members API', type: :request do
     it 'deletes a member' do
       expect do
         delete "/api/v1/members/#{member.id}",
-               headers: { 'Authorization' => 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Jddfq3-7sAXByGP8q58Iu43FIMA1DW1Kz_08tGb9VKI' }
+               headers: test_bearer
       end.to change { Member.count }.from(1).to(0)
 
       expect(response).to have_http_status(:no_content)
@@ -106,7 +106,7 @@ describe 'Members API', type: :request do
     it 'updates a member' do
       patch "/api/v1/members/#{member.id}",
             params: { country: 'Canada' },
-            headers: { 'Authorization' => 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Jddfq3-7sAXByGP8q58Iu43FIMA1DW1Kz_08tGb9VKI' }
+            headers: test_bearer
 
       expect(response).to have_http_status(:accepted)
       expect(response_body['country']).to eq('Canada')
@@ -115,7 +115,7 @@ describe 'Members API', type: :request do
     it 'changes a member team' do
       patch "/api/v1/members/#{member.id}",
             params: { id: member.id, team_name: 'Alternative Team' },
-            headers: { 'Authorization' => 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Jddfq3-7sAXByGP8q58Iu43FIMA1DW1Kz_08tGb9VKI' }
+            headers: test_bearer
 
       expect(response).to have_http_status(:accepted)
       expect(response_body['team']).to eq(alt_team.name)
@@ -124,7 +124,7 @@ describe 'Members API', type: :request do
     it 'fails when team is changed to an invalid team' do
       patch "/api/v1/members/#{member.id}",
             params: { id: member.id, team_name: 'Wrong Team' },
-            headers: { 'Authorization' => 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Jddfq3-7sAXByGP8q58Iu43FIMA1DW1Kz_08tGb9VKI' }
+            headers: test_bearer
 
       expect(response).to have_http_status(:unprocessable_entity)
     end
@@ -139,7 +139,7 @@ describe 'Members API', type: :request do
 
     it 'displays a specific member' do
       get "/api/v1/members/#{member.id}",
-                headers: { 'Authorization' => 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Jddfq3-7sAXByGP8q58Iu43FIMA1DW1Kz_08tGb9VKI' }
+          headers: test_bearer
 
       expect(response).to have_http_status(:ok)
       expect(response_body).to eq(first_response)

@@ -10,7 +10,7 @@ module Api
       def index
         @teams = Team.limit(limit).offset(params[:offset])
 
-        render json: TeamsSerializer.new(@teams).as_json, status: :ok, status: :ok
+        render json: TeamsSerializer.new(@teams).as_json, status: :ok
       end
 
       def create

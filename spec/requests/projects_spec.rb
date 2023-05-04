@@ -53,7 +53,7 @@ describe 'Projects API', type: :request do
       expect do
         post '/api/v1/projects',
              params: { project: { name: 'Test Project 1' } },
-             headers: { 'Authorization' => 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Jddfq3-7sAXByGP8q58Iu43FIMA1DW1Kz_08tGb9VKI' }
+             headers: test_bearer
       end.to change { Project.count }.from(0).to(1)
       expect(Project.count).to eq(1)
 
@@ -73,7 +73,7 @@ describe 'Projects API', type: :request do
     it 'deletes a project' do
       expect do
         delete "/api/v1/projects/#{project.id}",
-               headers: { 'Authorization' => 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Jddfq3-7sAXByGP8q58Iu43FIMA1DW1Kz_08tGb9VKI' }
+               headers: test_bearer
       end.to change { Project.count }.from(1).to(0)
 
       expect(response).to have_http_status(:no_content)
@@ -96,32 +96,31 @@ describe 'Projects API', type: :request do
     it 'updates a project' do
       patch "/api/v1/projects/#{project.id}",
             params: { name: 'Test Project 2' },
-            headers: { 'Authorization' => 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Jddfq3-7sAXByGP8q58Iu43FIMA1DW1Kz_08tGb9VKI' }
+            headers: test_bearer
 
       expect(response).to have_http_status(:accepted)
       expect(response_body['name']).to eq('Test Project 2')
     end
 
     it 'adds a member to a project' do
-      patch "/api/v1/projects/#{project.id}/add_member",
+      patch "/api/v1/projects/#{project.id}/add",
             params: { member_id: member.id },
-            headers: { 'Authorization' => 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Jddfq3-7sAXByGP8q58Iu43FIMA1DW1Kz_08tGb9VKI' }
+            headers: test_bearer
 
       expect(response).to have_http_status(:accepted)
       expect(response.body).to include('Test Project 1')
     end
 
     it 'removes a member from a project' do
-      patch "/api/v1/projects/#{project.id}/remove_member",
+      patch "/api/v1/projects/#{project.id}/add",
             params: { member_id: member.id },
-            headers: { 'Authorization' => 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Jddfq3-7sAXByGP8q58Iu43FIMA1DW1Kz_08tGb9VKI' }
+            headers: test_bearer
 
       expect(response.body).to include('Test Project 1')
 
-      patch :remove_member, params: {
-        id: project.id, member_id: member.id,
-        headers: { 'Authorization' => 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Jddfq3-7sAXByGP8q58Iu43FIMA1DW1Kz_08tGb9VKI' }
-      }
+      patch "/api/v1/projects/#{project.id}/remove",
+            params: { member_id: member.id },
+            headers: test_bearer
 
       expect(response).to have_http_status(:no_content)
       expect(response.body).not_to include('Test Project 1')
@@ -154,7 +153,7 @@ describe 'Projects API', type: :request do
 
     it 'displays a specific project' do
       get "/api/v1/projects/#{project1.id}",
-          headers: { 'Authorization' => 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Jddfq3-7sAXByGP8q58Iu43FIMA1DW1Kz_08tGb9VKI' }
+          headers: test_bearer
 
       expect(response).to have_http_status(:ok)
       expect(response_body).to eq({ 'name' => 'First Test Project' })
@@ -162,13 +161,12 @@ describe 'Projects API', type: :request do
 
     it 'shows members of a project' do
       get "/api/v1/projects/#{project1.id}/members",
-          headers: { 'Authorization' => 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Jddfq3-7sAXByGP8q58Iu43FIMA1DW1Kz_08tGb9VKI' }
+          headers: test_bearer
 
       expect(response).to have_http_status(:ok)
       expect(response_body.length).to eq(2)
-      expect(response_body.first['projects']).to eq(["First Test Project"])
-      expect(response_body.last['projects']).to eq(["First Test Project"])
+      expect(response_body.first['projects']).to eq(['First Test Project'])
+      expect(response_body.last['projects']).to eq(['First Test Project'])
     end
   end
 end
-

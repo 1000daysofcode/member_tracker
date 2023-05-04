@@ -53,7 +53,7 @@ describe 'Teams API', type: :request do
       expect do
         post '/api/v1/teams',
              params: { team: { name: 'Test Team 1' } },
-             headers: { 'Authorization' => 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Jddfq3-7sAXByGP8q58Iu43FIMA1DW1Kz_08tGb9VKI' }
+             headers: test_bearer
       end.to change { Team.count }.from(0).to(1)
       expect(Team.count).to eq(1)
 
@@ -73,7 +73,7 @@ describe 'Teams API', type: :request do
     it 'deletes a team' do
       expect do
         delete "/api/v1/teams/#{team.id}",
-               headers: { 'Authorization' => 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Jddfq3-7sAXByGP8q58Iu43FIMA1DW1Kz_08tGb9VKI' }
+               headers: test_bearer
       end.to change { Team.count }.from(1).to(0)
 
       expect(response).to have_http_status(:no_content)
@@ -91,7 +91,7 @@ describe 'Teams API', type: :request do
     it 'updates a team' do
       patch "/api/v1/teams/#{team.id}",
             params: { name: 'Test Team 2' },
-            headers: { 'Authorization' => 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Jddfq3-7sAXByGP8q58Iu43FIMA1DW1Kz_08tGb9VKI' }
+            headers: test_bearer
 
       expect(response).to have_http_status(:accepted)
       expect(response_body['name']).to eq('Test Team 2')
@@ -104,16 +104,16 @@ describe 'Teams API', type: :request do
 
     before do
       FactoryBot.create(:member, first_name: 'Bill', last_name: 'Bob', city: 'Yale',
-                        state: 'Connecticut', country: 'USA', team_id: team1.id)
+                                 state: 'Connecticut', country: 'USA', team_id: team1.id)
       FactoryBot.create(:member, first_name: 'Jenny', last_name: 'Gump', city: 'New Orleans',
-                        state: 'Louisiana', country: 'USA', team_id: team1.id)
+                                 state: 'Louisiana', country: 'USA', team_id: team1.id)
       FactoryBot.create(:member, first_name: 'Foo', last_name: 'Bar', city: 'Palo Alto',
-                        state: 'California', country: 'USA', team_id: team2.id)
+                                 state: 'California', country: 'USA', team_id: team2.id)
     end
 
     it 'displays a specific team' do
       get "/api/v1/teams/#{team1.id}",
-          headers: { 'Authorization' => 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Jddfq3-7sAXByGP8q58Iu43FIMA1DW1Kz_08tGb9VKI' }
+          headers: test_bearer
 
       expect(response).to have_http_status(:ok)
       expect(response_body).to eq({ 'name' => 'Test Team' })
@@ -121,7 +121,7 @@ describe 'Teams API', type: :request do
 
     it 'displays all members of a team' do
       get "/api/v1/teams/#{team1.id}/members",
-          headers: { 'Authorization' => 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Jddfq3-7sAXByGP8q58Iu43FIMA1DW1Kz_08tGb9VKI' }
+          headers: test_bearer
 
       expect(response).to have_http_status(:ok)
       expect(response_body.length).to eq(2)

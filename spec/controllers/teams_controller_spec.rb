@@ -23,7 +23,7 @@ RSpec.describe Api::V1::TeamsController, type: :controller do
         expect do
           post :create,
                params: { team: { name: 'Test Team 1' },
-                         headers: { 'Authorization' => 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Jddfq3-7sAXByGP8q58Iu43FIMA1DW1Kz_08tGb9VKI' } }
+                         headers: test_bearer }
         end.to change { Team.count }.from(0).to(1)
 
         expect(Team.count).to eq(1)
@@ -63,7 +63,7 @@ RSpec.describe Api::V1::TeamsController, type: :controller do
       it 'updates a team' do
         patch :update, params: {
           id: team.id, name: 'Test Team 2',
-          headers: { 'Authorization' => 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Jddfq3-7sAXByGP8q58Iu43FIMA1DW1Kz_08tGb9VKI' }
+          headers: test_bearer
         }
 
         expect(response).to have_http_status(:accepted)
@@ -95,7 +95,7 @@ RSpec.describe Api::V1::TeamsController, type: :controller do
     it 'displays a specific team' do
       get :show, params: {
         id: team.id,
-        headers: { 'Authorization' => 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Jddfq3-7sAXByGP8q58Iu43FIMA1DW1Kz_08tGb9VKI' }
+        headers: test_bearer
       }
 
       expect(response).to have_http_status(:ok)
@@ -104,12 +104,11 @@ RSpec.describe Api::V1::TeamsController, type: :controller do
     it 'displays all members of a team' do
       get :show_members, params: {
         id: team.id,
-        headers: { 'Authorization' => 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoiMSJ9.Jddfq3-7sAXByGP8q58Iu43FIMA1DW1Kz_08tGb9VKI' }
+        headers: test_bearer
       }
 
       expect(response).to have_http_status(:ok)
       expect(JSON.parse(response.body).length).to eq(2)
     end
-
   end
 end
